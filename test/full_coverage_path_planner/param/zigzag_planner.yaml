@@ -1,0 +1,3 @@
+planners: 
+  - name: 'UTurn'
+    type: 'full_coverage_path_planner/UTurn'

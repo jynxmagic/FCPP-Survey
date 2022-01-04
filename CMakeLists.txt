@@ -36,6 +36,7 @@ add_library(${PROJECT_NAME}
         src/common.cpp
         src/${PROJECT_NAME}.cpp
         src/spiral_stc.cpp
+        src/uturn.cpp
         )
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}
@@ -61,20 +62,5 @@ catkin_install_python(
     nodes/coverage_progress
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
-if (CATKIN_ENABLE_TESTING)
-    catkin_add_gtest(test_common test/src/test_common.cpp test/src/util.cpp src/common.cpp)
-
-    catkin_add_gtest(test_spiral_stc test/src/test_spiral_stc.cpp test/src/util.cpp src/spiral_stc.cpp src/common.cpp src/${PROJECT_NAME}.cpp)
-    add_dependencies(test_spiral_stc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-    target_link_libraries(test_spiral_stc ${catkin_LIBRARIES})
-
-    find_package(OpenCV)
-    include_directories(${OpenCV_INCLUDE_DIRS})
-    target_link_libraries(test_spiral_stc ${OpenCV_LIBRARIES})
-
-    add_rostest(test/${PROJECT_NAME}/test_${PROJECT_NAME}.test)
-
-endif()
 
 roslint_cpp()

@@ -1,3 +1,0 @@
-planners:
-  - name: 'SpiralSTC'
-    type: 'full_coverage_path_planner/SpiralSTC'
