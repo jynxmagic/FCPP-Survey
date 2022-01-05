@@ -61,6 +61,9 @@ enum
   eNodeVisited = true
 };
 
+
+float score(float coverage, int repeated_count, float time_ms);
+
 /**
  * Find the distance from poi to the closest point in goals
  * @param poi Starting point

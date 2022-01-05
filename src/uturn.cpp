@@ -241,6 +241,10 @@ bool UTurn::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msg
   ROS_INFO("naive cpp completed!");
   ROS_INFO("Converting path to plan");
 
+
+  clock_t end = clock();
+  float elapsed_secs = static_cast<float>((end - begin) / CLOCKS_PER_SEC)*1000;
+
   parsePointlist2Plan(start, goalPoints, plan);
   // Print some metrics:
   spiral_cpp_metrics_.accessible_counter = spiral_cpp_metrics_.visited_counter
@@ -250,6 +254,7 @@ bool UTurn::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msg
   ROS_INFO("Total re-visited: %d", spiral_cpp_metrics_.multiple_pass_counter);
   ROS_INFO("Total accessible cells: %d", spiral_cpp_metrics_.accessible_counter);
   ROS_INFO("Total accessible area: %f", spiral_cpp_metrics_.total_area_covered);
+  ROS_INFO("Score is: %f", score(spiral_cpp_metrics_.accessible_counter-(spiral_cpp_metrics_.visited_counter-spiral_cpp_metrics_.multiple_pass_counter), spiral_cpp_metrics_.multiple_pass_counter, elapsed_secs));
 
   // TODO(CesarLopez): Check if global path should be calculated repetitively or just kept
   // (also controlled by planner_frequency parameter in move_base namespace)
@@ -259,8 +264,6 @@ bool UTurn::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msg
   ROS_INFO("Plan published!");
   ROS_DEBUG("Plan published");
 
-  clock_t end = clock();
-  double elapsed_secs = static_cast<double>(end - begin) / CLOCKS_PER_SEC;
   std::cout << "elapsed time: " << elapsed_secs << "\n";
 
   return true;
