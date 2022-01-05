@@ -85,54 +85,6 @@ std::list<gridNode_t> UTurn::move(std::vector<std::vector<bool> > const& grid, s
       dx = dy;
       dy = -dx_prev;
     }
-
-    /*
-    if (it != pathNodes.begin())
-    {
-      // turn ccw
-      dx = pathNodes.back().pos.x - prev.pos.x;
-      dy = pathNodes.back().pos.y - prev.pos.y;
-      dx_prev = dx;
-      dx = -dy;
-      dy = dx_prev;
-    }
-    else
-    {
-      // Initialize spiral direction towards y-axis
-      dx = 0;
-      dy = 1;
-    }
-    done = true;
-
-    for (int i = 0; i < 4; ++i)
-    {
-      x2 = pathNodes.back().pos.x + dx;
-      y2 = pathNodes.back().pos.y + dy;
-      if (x2 >= 0 && x2 < nCols && y2 >= 0 && y2 < nRows)
-      {
-        if (grid[y2][x2] == eNodeOpen && visited[y2][x2] == eNodeOpen)
-        {
-          Point_t new_point = { x2, y2 };
-          gridNode_t new_node =
-          {
-            new_point,  // Point: x,y
-            0,          // Cost
-            0,          // Heuristic
-          };
-          prev = pathNodes.back();
-          pathNodes.push_back(new_node);
-          it = --(pathNodes.end());
-          visited[y2][x2] = eNodeVisited;  // Close node
-          done = false;
-          break;
-        }
-      }
-      // try next direction cw
-      dx_prev = dx;
-      dx = dy;
-      dy = -dx_prev;
-    } */
-
   }
   return pathNodes;
 }
@@ -169,7 +121,6 @@ std::list<Point_t> UTurn::moveFull(std::vector<std::vector<bool> > const& grid,
   printGrid(grid, visited, fullPath);
 #endif
 
-  pathNodes = UTurn::move(grid, pathNodes, visited);                // First spiral fill
   std::list<Point_t> goals = map_2_goals(visited, eNodeOpen);  // Retrieve remaining goalpoints
   // Add points to full path
   std::list<gridNode_t>::iterator it;
@@ -179,8 +130,6 @@ std::list<Point_t> UTurn::moveFull(std::vector<std::vector<bool> > const& grid,
     visited_counter++;
     fullPath.push_back(newPoint);
   }
-  // Remove all elements from pathNodes list except last element
-  pathNodes.erase(pathNodes.begin(), --(pathNodes.end()));
 
 #ifdef DEBUG_PLOT
   ROS_INFO("Current grid after first spiral is");
