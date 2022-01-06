@@ -1,0 +1,3 @@
+planners:
+  - name: 'AntColonyOptimization'
+    type: 'full_coverage_path_planner/AntColonyOptimization'

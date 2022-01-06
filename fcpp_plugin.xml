@@ -11,4 +11,9 @@
       Plans a path thats covers all accessible points in a costmap using a simple straight line pattern.
     </description>
   </class>
+  <class name="full_coverage_path_planner/AntColonyOptimization" type="full_coverage_path_planner::AntColonyOptimization" base_class_type="nav_core::BaseGlobalPlanner">
+    <description>
+      Plans a full coverage path using the ant colong optimization method.
+    </description>
+  </class>
 </library>
