@@ -40,7 +40,6 @@ namespace full_coverage_path_planner
     std::list<Point_t> AntColonyOptimization::runACO(std::vector<std::vector<bool> > const &grid,
                                         Point_t &init)
     {
-        ROS_INFO("RUNACO");
         std::list<Point_t> optimalPath;
         float scoreOptimal;
 
@@ -133,6 +132,11 @@ namespace full_coverage_path_planner
                     {
                         possible_movements.push_back(Point_t {xt, yt});
                     }
+                }
+                if(possible_movements.size() == 0)
+                {
+                    ROS_INFO("deadlock");
+                    break;
                 }
                 for (Point_t point : possible_movements)
                 {
