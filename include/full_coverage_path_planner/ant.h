@@ -26,6 +26,15 @@ namespace full_coverage_path_planner
     class Ant
     {
         public:
+
+            std::vector<std::vector<float>> personal_pheromone_grid;
+            std::vector<std::vector<float>> personal_score_grid;
+            float current_path_score;
+
+            /**
+             * 
+             * */
+            Ant(Point_t start_point, std::vector<std::vector<float>> pheromone_grid, std::vector<std::vector<float>> score_grid);
             /**
              *
              **/
@@ -33,20 +42,24 @@ namespace full_coverage_path_planner
             /**
              * 
              * */
-            bool canMove(std::vector<std::vector<bool>> const& grid);
+            bool canMove(std::vector<std::vector<bool>> const& grid,
+            std::list<Point_t> to);
             /**
              * 
              * */
-            void move(std::vector<std::vector<bool>> const& grid, std::vector<std::vector<float>> pheromoneGrid, std::vector<std::vector<float>> costGrid);
+            void move(
+                Point_t new_location,
+                bool add_to_path
+            );
 
             std::list<Point_t> getCurrentPath();
+            std::list<gridNode_t> getCurrentPathForAstar();
             Point_t getCurrentLocation();
             float getPheromoneEvaporationRate();
-            float getCurrentPathScore();
+
         private:
             std::list<Point_t> current_path;
             Point_t current_location;
             float pheromone_rate;
-            float current_path_score;
     };
 };

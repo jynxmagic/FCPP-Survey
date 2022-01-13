@@ -29,9 +29,7 @@ namespace full_coverage_path_planner
     {
         public:
             std::list<Point_t> runACO(std::vector<std::vector<bool> > const &grid,
-                                        Point_t &init,
-                                        int &multiple_pass_counter,
-                                        int &visited_counter);
+                                        Point_t &init);
         private:
             bool makePlan(const geometry_msgs::PoseStamped &start, const geometry_msgs::PoseStamped &goal,
                 std::vector<geometry_msgs::PoseStamped> &plan);

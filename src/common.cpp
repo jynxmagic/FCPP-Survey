@@ -9,12 +9,11 @@
 
 #include <full_coverage_path_planner/common.h>
 
-float score(float coverage, int repeated_count, float time_ms)
+float score(float coverage, int repeated_count)
 {
-  float time_score = time_ms * 2;
-  float coverage_score = coverage * 100000; //high score iterates the importance of coverage
-  int repeated_score = repeated_count * 1000;
-  return time_score + coverage_score + repeated_score;
+  float coverage_score = coverage*1000.00;
+  float repeated_score = (coverage_score-repeated_score*100.0);
+  return coverage_score + repeated_score;
 }
 
 int distanceToClosestPoint(Point_t poi, std::list<Point_t> const& goals)

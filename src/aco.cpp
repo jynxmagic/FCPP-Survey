@@ -38,64 +38,194 @@ namespace full_coverage_path_planner
     }
 
     std::list<Point_t> AntColonyOptimization::runACO(std::vector<std::vector<bool> > const &grid,
-                                        Point_t &init,
-                                        int &multiple_pass_counter,
-                                        int &visited_counter)
+                                        Point_t &init)
     {
+        ROS_INFO("RUNACO");
         std::list<Point_t> optimalPath;
-        //1. initialize ants (n=300)
-
-        //-------------
-        ///ANTS
-        //-------------
-        //properties##
-        //std::list<Point_t> current_path
-        //Point_t current_location
-        //float Pheromone evaporation rate (0.1)
-        ////float current_path_score
-        //std::vector<std::vector<bool>> visitedGrid
-        //attributes##
-        //std::vector<std::vector<int>> producePheromonesForCurrentLocation(pheromoneGrid, costOfMovement) --> returns updated pheromone grid
-        //bool canMove(grid) --> any nearby travesable tiles?
-        //void move(grid, pheromone_grid, cost_grid)
+        float scoreOptimal;
 
         //2. initialize pheromone grid
-        std::vector<std::vector<float>> pheromoneGrid;
+        std::vector<std::vector<float>> og_grid;
         
-        // declare std::vector<std::vector<float>> pheromone_grid;
-        // foreach tile in original_grid
-        //      pheromone_grid[x][y] = 1
+        int i =0;
+        int accessable_tiles = 0;
+        for(std::vector<bool> x : grid)
+        {
+            int j = 0;
+            std::vector<float> temps;
+            for(bool y : grid[i])
+            {
+                temps.push_back(1.0);
+                j++;
+                if(y==eNodeOpen)
+                {
+                    accessable_tiles++;
+                }
+            }
+            og_grid.push_back(temps);
+            i++;
+        }
+        std::vector<std::vector<float>> global_pheromone_grid = og_grid;
+        std::vector<std::vector<float>> global_score_grid = og_grid;
 
+        ROS_INFO("GRID BUILT");
+
+        //1. initialize ants (n=300)
+        std::list<Ant> ants;
+
+        Point_t start = {init.x, init.y};
+
+        for(int i=0; i<300; ++i)
+        {
+            std::vector<std::vector<float>> personal_pheromone_grid = og_grid; //TODO check if copy ref or new obj
+            std::vector<std::vector<float>> personal_scored_grid = og_grid;
+            ants.push_back(Ant(start, personal_pheromone_grid, personal_scored_grid));
+        }
+
+
+        ROS_INFO("ALL ANTS BUILT");
         //foreach ant
 
-        //3. while goals remain
-        //goals = map_2_goals(ant.visited, eNodeOpen)
+        std::list<Ant> ants_completed_tour;
 
-        //3.1 score grid when travesable tiles have been travelled to
-        // poss movements
-        //for i = 4
-        //  x+1, y+1, x-1, y-1
-        //  ant.move(x,y) -> moveAnt
-        //  score(ant.visited, grid, etc.) ->Score location
-        //   poss_movements[i] = score -> store score
-        //  ant.move(origX, origY) -> go back
+        int antCount = 0;
 
-        //3.2 if no traversable tiles, astar to open space
-        //if(!ant.canMove)
-        // astar_to_open_space
+        for(Ant ant : ants)
+        {
+            std::vector<std::vector<bool>> visited = grid;
+            visited[init.x][init.y]= eNodeVisited;
 
-        //3.3 else, move ant to tile with highest probability
-        // probability of movement =
-        //  for i in poss_movements
-        //      pheromone * cost / sum(pheromone * cost)
-        // rng_value = rng.getnumberfloatbetween01
-        // if rng >=loc 1 & < loc2. go loc 1. elif rng > loc 2 & rng<=lo3, go loc3. etc.
+            std::list<Point_t> goals = map_2_goals(visited, eNodeOpen);
 
-        //3.4 update pheromone at current location
-        // pheromone grid = ant.producePheromone(pheromone_grid, poss_movements)
-        //endwhile
+            int visited_counter = 0;
+            int multiple_pass_counter = 0;
+            int coverage = 0;
 
-        //return ant with lowest cost path
+            while(!goals.empty())
+            {
+                ROS_INFO("goals %li", goals.size());
+                int orig_x = ant.getCurrentLocation().x;
+                int orig_y = ant.getCurrentLocation().y;
+                std::list<Point_t> possible_movements;
+                for(int i = 0; i < 4; i++)
+                {
+                    int xt = orig_x;
+                    int yt = orig_y;
+
+                    if(i==0)
+                    {
+                        xt+=1;
+                    }
+                    if(i==1)
+                    {
+                        xt-=1;
+                    }
+                    if(i==2)
+                    {
+                        yt+=1;
+                    }
+                    if(i==3)
+                    {
+                        yt-1;
+                    }
+
+                    if(visited[xt][yt] == eNodeOpen)
+                    {
+                        possible_movements.push_back(Point_t {xt, yt});
+                    }
+                }
+                for (Point_t point : possible_movements)
+                {
+                    int xt = point.x;
+                    int yt = point.y;
+                    ant.move(point, false);
+                    visited_counter++;
+                    visited[xt][yt] = eNodeVisited;
+                    float coveragef = static_cast<float>(coverage)/ static_cast<float>(accessable_tiles);
+                    ant.personal_score_grid[xt][yt] = score(coveragef, multiple_pass_counter);
+                    visited[xt][yt] = eNodeOpen;
+                    coverage--;
+                    visited_counter--;
+                    ant.move(Point_t {orig_x, orig_y}, false);
+                }
+                float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+                std::list<Pos_proba> proba;
+
+                i=0;//
+                float proba_sum = 0;
+                for(Point_t point : possible_movements)
+                {
+                    float loc_phera_personal = ant.personal_pheromone_grid[point.x][point.y];
+                    float loc_score_personal = ant.personal_score_grid[point.x][point.y];
+
+                    float sum = 1;
+
+                    for(Ant a : ants_completed_tour)
+                    {
+                        sum += a.personal_pheromone_grid[point.x][point.y] * a.personal_score_grid[point.x][point.y];
+                    }
+                    
+                    float probat = 0;
+                    probat = loc_phera_personal * loc_score_personal / sum;
+                    proba_sum+=probat;
+                    proba.push_back({point, probat});
+                }
+
+                Point_t new_location;
+                                
+                float s=0;
+                for(Pos_proba pp : proba)
+                {
+                    s+=pp.proba/proba_sum;
+                    if(r <= s)
+                    {
+                        new_location = pp.pos;
+                        break;
+                    }
+                }
+                float pheromone;
+                float sumphera = 1;
+                for(Ant b : ants_completed_tour)
+                {
+                    bool t_on_p = false;
+                    std::list<Point_t> ct = b.getCurrentPath();
+                    for(Point_t t : ct)
+                    {
+                        if(t.x == new_location.x && t.y == new_location.y)
+                        {
+                            sumphera += 1/b.getCurrentPath().size();
+                        }
+                    }
+                }
+                pheromone = ((1-0.6) * (ant.personal_pheromone_grid[new_location.x][new_location.y])) * sumphera;
+                ant.personal_pheromone_grid[new_location.x][new_location.y] = pheromone;
+                for(Point_t p : ant.getCurrentPath())
+                {
+                    if(new_location.x == p.x && new_location.y == p.y)
+                    {
+                        multiple_pass_counter++;
+                    }
+                    else
+                    {
+                        coverage++;
+                    }
+                }
+                visited[new_location.x][new_location.y] = eNodeVisited;
+                ant.move(new_location, true);
+                ROS_INFO("Ant %i moving to x:%i, y:%i", antCount, new_location.x, new_location.y);
+                visited_counter++;
+                goals = map_2_goals(visited, eNodeOpen);
+            }
+
+            float ant_score_final = score(coverage, multiple_pass_counter);
+
+            if(ant_score_final < scoreOptimal)
+            {
+                optimalPath = ant.getCurrentPath();
+            }
+            antCount++;
+        }
 
         return optimalPath;
     }
@@ -140,10 +270,7 @@ namespace full_coverage_path_planner
     printGrid(grid, grid, printPath);
     #endif
 
-    std::list<Point_t> goalPoints = runACO(grid,
-                                                startPoint,
-                                                spiral_cpp_metrics_.multiple_pass_counter,
-                                                spiral_cpp_metrics_.visited_counter);
+    std::list<Point_t> goalPoints = runACO(grid, startPoint);
     ROS_INFO("naive cpp completed!");
     ROS_INFO("Converting path to plan");
 

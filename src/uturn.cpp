@@ -254,7 +254,7 @@ bool UTurn::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msg
   ROS_INFO("Total re-visited: %d", spiral_cpp_metrics_.multiple_pass_counter);
   ROS_INFO("Total accessible cells: %d", spiral_cpp_metrics_.accessible_counter);
   ROS_INFO("Total accessible area: %f", spiral_cpp_metrics_.total_area_covered);
-  ROS_INFO("Score is: %f", score(spiral_cpp_metrics_.accessible_counter-(spiral_cpp_metrics_.visited_counter-spiral_cpp_metrics_.multiple_pass_counter), spiral_cpp_metrics_.multiple_pass_counter, elapsed_secs));
+  ROS_INFO("Score is: %f", score(spiral_cpp_metrics_.accessible_counter-(spiral_cpp_metrics_.visited_counter-spiral_cpp_metrics_.multiple_pass_counter), spiral_cpp_metrics_.multiple_pass_counter));
 
   // TODO(CesarLopez): Check if global path should be calculated repetitively or just kept
   // (also controlled by planner_frequency parameter in move_base namespace)

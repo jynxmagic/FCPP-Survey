@@ -13,7 +13,7 @@
   </class>
   <class name="full_coverage_path_planner/AntColonyOptimization" type="full_coverage_path_planner::AntColonyOptimization" base_class_type="nav_core::BaseGlobalPlanner">
     <description>
-      Plans a full coverage path using the ant colong optimization method.
+      Plans a full coverage path using the ant colony optimization method.
     </description>
   </class>
 </library>
