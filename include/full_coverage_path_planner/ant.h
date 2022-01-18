@@ -27,18 +27,37 @@ namespace full_coverage_path_planner
     {
         public:
 
-            std::vector<std::vector<float>> personal_pheromone_grid;
-            std::vector<std::vector<float>> personal_score_grid;
+            std::vector<std::vector<_Float64>> personal_pheromone_grid;
+            std::vector<std::vector<_Float64>> personal_score_grid;
             float current_path_score;
+            int visited_counter;
+            int multiple_pass_counter;
+            int coverage;
 
             /**
              * 
              * */
-            Ant(Point_t start_point, std::vector<std::vector<float>> pheromone_grid, std::vector<std::vector<float>> score_grid);
+            Ant(Point_t start_point, std::vector<std::vector<_Float64>> pheromone_grid, std::vector<std::vector<_Float64>> score_grid);
             /**
              *
              **/
-            std::vector<std::vector<float>> producePheromones(std::vector<std::vector<float>> pheromoneGrid, std::vector<std::vector<float>> costGrid);
+            std::vector<std::vector<_Float64>> producePheromones(std::vector<std::vector<_Float64>> pheromoneGrid, std::vector<std::vector<_Float64>> costGrid);
+            /**
+             * @brief 
+             * 
+             */
+            std::list<Point_t> getPossibleMovements(std::vector<std::vector<bool>> visited);
+
+            /**
+             * @brief 
+             * 
+             */
+            bool resolveDeadlock(std::vector<std::vector<bool>> visited, std::list<Point_t> goals, std::vector<std::vector<bool>> const& grid);
+            /**
+             * @brief 
+             * 
+             */
+            void scoreNearbyTiles(std::vector<std::vector<bool>> visited, int accessable_tiles_count);
             /**
              * 
              * */

@@ -1,18 +1,20 @@
 //
-// Copyright [2020] Nobleo Technology"  [legal/copyright]
+// Copyright [2022] Manchester Metropolitian University"  [legal/copyright]
 //
 #include <algorithm>
 #include <iostream>
 #include <limits>
 #include <list>
 #include <vector>
+#include <map>
+#include <math.h>
 
 #include <full_coverage_path_planner/common.h>
 
-float score(float coverage, int repeated_count)
+_Float64 score(_Float64 coverage, int repeated_count)
 {
-  float coverage_score = coverage*1000.00;
-  float repeated_score = (coverage_score-repeated_score*100.0);
+  _Float64 coverage_score = coverage*1000.00;
+  _Float64 repeated_score = (coverage_score-repeated_score*100.0);
   return coverage_score + repeated_score;
 }
 
@@ -30,6 +32,15 @@ int distanceToClosestPoint(Point_t poi, std::list<Point_t> const& goals)
     }
   }
   return min_dist;
+}
+
+
+static double calculateH(int x, int y, Point_t dest) {
+  return sqrt(
+    (x-dest.x)*(x-dest.x)
+    +
+    (y-dest.y) * (y-dest.y)
+  );
 }
 
 int distanceSquared(const Point_t& p1, const Point_t& p2)

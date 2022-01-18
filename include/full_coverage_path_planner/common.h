@@ -25,7 +25,7 @@ inline std::ostream &operator << (std::ostream &os, Point_t &p)
 typedef struct
 {
   Point_t pos;
-  float proba;
+  _Float64 proba;
 } 
 Pos_proba;
 
@@ -44,6 +44,16 @@ typedef struct
   int he;
 }
 gridNode_t;
+
+
+typedef struct
+{
+  Point_t pos;
+  int cost;
+  int he;
+  std::list<Point_t> path_to_node;
+}
+astar_node;
 
 inline std::ostream &operator << (std::ostream &os, gridNode_t &g)
 {
@@ -69,7 +79,7 @@ enum
 };
 
 
-float score(float coverage, int repeated_count);
+_Float64 score(_Float64 coverage, int repeated_count);
 
 /**
  * Find the distance from poi to the closest point in goals
