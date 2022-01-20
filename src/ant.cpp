@@ -11,7 +11,7 @@
 
 namespace full_coverage_path_planner
 {
-    Ant::Ant(Point_t start_point, std::vector<std::vector<_Float64>> pheromone_grid, std::vector<std::vector<_Float64>> score_grid)
+    Ant::Ant(gridNode_t start_point, std::vector<std::vector<_Float64>> pheromone_grid, std::vector<std::vector<_Float64>> score_grid)
     {
         current_location = start_point;
         personal_pheromone_grid = pheromone_grid;
@@ -25,12 +25,12 @@ namespace full_coverage_path_planner
         return pheromoneGrid;
     }
 
-    std::list<Point_t> Ant::getPossibleMovements(std::vector<std::vector<bool>> visited)
+    std::list<gridNode_t> Ant::getPossibleMovements(std::vector<std::vector<bool>> visited)
     {
-        int orig_x = current_location.x;
-        int orig_y = current_location.y;
+        int orig_x = current_location.pos.x;
+        int orig_y = current_location.pos.y;
 
-        std::list<Point_t> possible_movements;
+        std::list<gridNode_t> possible_movements;
 
         for (int i = 0; i < 4; i++)
         {
@@ -54,9 +54,9 @@ namespace full_coverage_path_planner
                 yt - 1;
             }
 
-            if (visited[xt][yt] == eNodeOpen)
+            if (visited[yt][xt] == eNodeOpen)
             {
-                possible_movements.push_back(Point_t{xt, yt});
+                possible_movements.push_back({{xt, yt}, 0, 0});
             }
         }
 
@@ -65,7 +65,143 @@ namespace full_coverage_path_planner
 
     bool Ant::resolveDeadlock(std::vector<std::vector<bool>> visited, std::list<Point_t> goals, std::vector<std::vector<bool>> const& grid)
     {
+        bool resign = a_star_to_open_space(grid, current_location, 1, visited, goals, current_path);
+
+        multiple_pass_counter = 0;
+        coverage = 0;
+
+        //update visited grid from a*
+        std::list<gridNode_t>::iterator it;
+        for (it = current_path.begin(); it != current_path.end(); ++it)
+        {
+            if (visited[it->pos.y][it->pos.x] == eNodeVisited)
+            {
+                multiple_pass_counter++;
+            }
+            else
+            {
+                coverage++;
+            }
+            visited[it->pos.y][it->pos.x] = eNodeVisited;
+        }
+        if (current_path.size() > 0)
+        {
+            multiple_pass_counter--;  // First point is already counted as visited
+        }
+
+        return resign;
+
+        /*
         Point_t originalLocation = current_location;
+        std::list<Point_t> start_path;
+        start_path.push_back(current_location);
+
+        std::list<astar_node> openSet;
+        std::list<astar_node> closedSet;
+
+        openSet.push_back({originalLocation, 0, 0, 0, start_path});
+
+        Point_t dummy_goal = {current_location.x +4, current_location.y+4};
+
+        int g = 0;
+        if(grid[dummy_goal.y][dummy_goal.x] != eNodeOpen)
+        {
+            return false;
+        }
+        while(!openSet.empty())
+        {
+            int goal_value = INT32_MAX;
+            astar_node current_node;
+            int i = 0;
+            int pos = 0;
+            g++;
+            for(astar_node node : openSet)
+            {
+                if(node.he < goal_value)
+                {
+                    current_node = node;
+                    pos = i;
+                }
+                i++;
+            }
+
+
+            std::list<astar_node>::iterator iter = openSet.begin();
+            std::advance(iter, pos);
+            openSet.erase(iter);
+
+            if(current_node.pos.x == dummy_goal.x && current_node.pos.y == dummy_goal.y)
+            {
+                //found destination
+                for(Point_t point_on_path_to_destination : current_node.path_to_node)
+                {
+                    current_path.push_back(point_on_path_to_destination);
+                    visited[point_on_path_to_destination.y][point_on_path_to_destination.x] = eNodeVisited;
+                }
+                printGrid(grid, visited, current_path);
+                current_location = current_node.pos;
+                return true;
+            }
+
+            std::list<astar_node> possible_movements;
+            for (int i = 0; i < 4; i++)
+            {
+                int xt = current_node.pos.x;
+                int yt = current_node.pos.y;
+
+                if (i == 0)
+                {
+                    xt++;
+                }
+                if (i == 1)
+                {
+                    xt--;
+                }
+                if (i == 2)
+                {
+                    yt++;
+                }
+                if (i == 3)
+                {
+                    yt--;
+                }
+
+                if (grid[yt][xt] == eNodeOpen)
+                {
+                    std::list<Point_t> path_to_node = current_node.path_to_node;
+                    path_to_node.push_back({xt, yt});
+                    int h = distanceSquared({xt, yt}, dummy_goal);
+                    astar_node possible_movement = {{xt, yt}, g, h, g+h, path_to_node};
+                    bool skip = false;
+                    for(astar_node check_heuristic_node : openSet)
+                    {
+                        if(check_heuristic_node.pos.x == xt && check_heuristic_node.pos.y == yt && check_heuristic_node.he < g+h)
+                        {
+                            skip = true;
+                        }
+                    }
+                    for(astar_node check_heuristic_node : closedSet)
+                    {
+                        if(check_heuristic_node.pos.x == xt && check_heuristic_node.pos.y == yt && check_heuristic_node.he < g+h)
+                        {
+                            skip = true;
+                        }
+                    }
+
+                    if(skip != true)
+                    {
+                        openSet.push_back(possible_movement);
+                    }
+                }
+            }
+
+            closedSet.push_back(current_node);
+        }
+
+        return false;
+
+
+ /*       Point_t originalLocation = current_location;
 
         std::list<astar_node> openSet;
         std::list<Point_t> closedSet;
@@ -141,7 +277,7 @@ namespace full_coverage_path_planner
                         yt - 1;
                     }
 
-                    if (grid[xt][yt] == eNodeOpen)
+                    if (grid[yt][xt] == eNodeOpen)
                     {
                         Point_t possible_movement = {xt, yt};
                         bool isInClosedSet = false;
@@ -185,13 +321,13 @@ namespace full_coverage_path_planner
                 for (Point_t goalPoint : current_test.path_to_node)
                 {
                     current_path.push_back(goalPoint);
-                    if(visited[goalPoint.x][goalPoint.y] == eNodeVisited)
+                    if(visited[goalPoint.y][goalPoint.x] == eNodeVisited)
                     {
                         multiple_pass_counter++;
                     }
                     else
                     {
-                        visited[goalPoint.x][goalPoint.y] = eNodeVisited;
+                        visited[goalPoint.y][goalPoint.x] = eNodeVisited;
                         coverage++;
                     }
                     visited_counter++;
@@ -201,39 +337,39 @@ namespace full_coverage_path_planner
                 return true;
             }
         }
-        return false;
+        return false; */
     }
 
     void Ant::scoreNearbyTiles(std::vector<std::vector<bool>> visited, int accessable_tiles_count)
     {
-        std::list<Point_t> possible_movements = getPossibleMovements(visited);
+        std::list<gridNode_t> possible_movements = getPossibleMovements(visited);
 
-        int orig_x = getCurrentLocation().x;
-        int orig_y = getCurrentLocation().y;
+        int orig_x = current_location.pos.x;
+        int orig_y = current_location.pos.y;
 
-        for (Point_t point : possible_movements)
+        for (gridNode_t point : possible_movements)
         {
-            int xt = point.x;
-            int yt = point.y;
+            int xt = point.pos.x;
+            int yt = point.pos.y;
             move(point, false);
             visited_counter++;
             coverage++;
-            visited[xt][yt] = eNodeVisited;
+            visited[yt][xt] = eNodeVisited;
             _Float64 coveragef = static_cast<_Float64>(coverage) / static_cast<_Float64>(accessable_tiles_count);
-            personal_score_grid[xt][yt] = score(coveragef, multiple_pass_counter);
-            visited[xt][yt] = eNodeOpen;
+            personal_score_grid[yt][xt] = score(coveragef, multiple_pass_counter);
+            visited[yt][xt] = eNodeOpen;
             coverage--;
             visited_counter--;
-            move(Point_t{orig_x, orig_y}, false);
+            move({{orig_x, orig_y}, 0, 0}, false);
         }
     }
 
     bool Ant::canMove(std::vector<std::vector<bool>> const &grid,
-                      std::list<Point_t> to)
+                      std::list<gridNode_t> to)
     {
-        for (Point_t point : to)
+        for (gridNode_t point : to)
         {
-            if (grid[point.x][point.y] == eNodeOpen)
+            if (grid[point.pos.y][point.pos.x] == eNodeOpen)
             {
                 return true;
             }
@@ -242,7 +378,7 @@ namespace full_coverage_path_planner
     }
 
     void Ant::move(
-        Point_t new_location,
+        gridNode_t new_location,
         bool add_to_path)
     {
         current_location = new_location; //Point_t
@@ -250,32 +386,5 @@ namespace full_coverage_path_planner
         {
             current_path.push_back(current_location);
         }
-    }
-
-    std::list<gridNode_t> Ant::getCurrentPathForAstar()
-    {
-        std::list<gridNode_t> nodes;
-        for (Point_t point : current_path)
-        {
-            nodes.push_back({point,
-                             0,
-                             0});
-        }
-        return nodes;
-    }
-
-    std::list<Point_t> Ant::getCurrentPath()
-    {
-        return current_path;
-    }
-
-    Point_t Ant::getCurrentLocation()
-    {
-        return current_location;
-    }
-
-    float Ant::getPheromoneEvaporationRate()
-    {
-        return pheromone_rate;
     }
 }

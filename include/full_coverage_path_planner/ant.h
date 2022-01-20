@@ -33,11 +33,14 @@ namespace full_coverage_path_planner
             int visited_counter;
             int multiple_pass_counter;
             int coverage;
+            std::list<gridNode_t> current_path;
+            gridNode_t current_location;
+            float pheromone_rate;
 
             /**
              * 
              * */
-            Ant(Point_t start_point, std::vector<std::vector<_Float64>> pheromone_grid, std::vector<std::vector<_Float64>> score_grid);
+            Ant(gridNode_t start_point, std::vector<std::vector<_Float64>> pheromone_grid, std::vector<std::vector<_Float64>> score_grid);
             /**
              *
              **/
@@ -46,7 +49,7 @@ namespace full_coverage_path_planner
              * @brief 
              * 
              */
-            std::list<Point_t> getPossibleMovements(std::vector<std::vector<bool>> visited);
+            std::list<gridNode_t> getPossibleMovements(std::vector<std::vector<bool>> visited);
 
             /**
              * @brief 
@@ -62,23 +65,13 @@ namespace full_coverage_path_planner
              * 
              * */
             bool canMove(std::vector<std::vector<bool>> const& grid,
-            std::list<Point_t> to);
+            std::list<gridNode_t> to);
             /**
              * 
              * */
             void move(
-                Point_t new_location,
+                gridNode_t new_location,
                 bool add_to_path
             );
-
-            std::list<Point_t> getCurrentPath();
-            std::list<gridNode_t> getCurrentPathForAstar();
-            Point_t getCurrentLocation();
-            float getPheromoneEvaporationRate();
-
-        private:
-            std::list<Point_t> current_path;
-            Point_t current_location;
-            float pheromone_rate;
     };
 };

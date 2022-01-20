@@ -25,13 +25,6 @@ inline std::ostream &operator << (std::ostream &os, Point_t &p)
 typedef struct
 {
   Point_t pos;
-  _Float64 proba;
-} 
-Pos_proba;
-
-typedef struct
-{
-  Point_t pos;
 
   /** Path cost
    * cost of the path from the start node to gridNode_t
@@ -45,15 +38,13 @@ typedef struct
 }
 gridNode_t;
 
-
 typedef struct
 {
-  Point_t pos;
-  int cost;
-  int he;
-  std::list<Point_t> path_to_node;
-}
-astar_node;
+  gridNode_t pos;
+  _Float64 proba;
+} 
+Pos_proba;
+
 
 inline std::ostream &operator << (std::ostream &os, gridNode_t &g)
 {
@@ -136,6 +127,12 @@ void printGrid(std::vector<std::vector<bool> > const& grid,
  * Print a 2D array of bools to stdout
  */
 void printGrid(std::vector<std::vector<bool> > const& grid);
+
+
+void printGrid(std::vector<std::vector<_Float64> > const& grid);
+
+int manhattenDistance(const Point_t& p1, const Point_t& p2);
+
 
 /**
  * Convert 2D grid of bools to a list of Point_t

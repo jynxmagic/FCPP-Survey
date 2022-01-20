@@ -43,6 +43,19 @@ static double calculateH(int x, int y, Point_t dest) {
   );
 }
 
+int manhattenDistance(const Point_t& p1, const Point_t& p2)
+{
+  double distance;
+  int x_dif, y_dif;
+  x_dif = p2.x - p1.x;
+  y_dif = p2.y - p1.y;
+  if(x_dif < 0)
+    x_dif = -x_dif;
+  if(y_dif < 0)
+    y_dif = -y_dif;
+  return x_dif + y_dif;
+}
+
 int distanceSquared(const Point_t& p1, const Point_t& p2)
 {
   int dx = p2.x - p1.x;
@@ -290,6 +303,25 @@ void printGrid(std::vector<std::vector<bool> > const& grid, std::vector<std::vec
 }
 
 void printGrid(std::vector<std::vector<bool> > const& grid)
+{
+  for (uint iy = grid.size() - 1; iy >= 0; --iy)
+  {
+    for (uint ix = 0; ix < grid[0].size(); ++ix)
+    {
+      if (grid[iy][ix])
+      {
+        std::cout << "\033[1;36m▓\033[0m";
+      }
+      else
+      {
+        std::cout << "\033[1;37m▓\033[0m";
+      }
+    }
+    std::cout << "\n";
+  }
+}
+
+void printGrid(std::vector<std::vector<_Float64> > const& grid)
 {
   for (uint iy = grid.size() - 1; iy >= 0; --iy)
   {
