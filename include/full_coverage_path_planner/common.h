@@ -45,6 +45,13 @@ typedef struct
 } 
 Pos_proba;
 
+typedef struct
+{
+  gridNode_t pos;
+  _Float64 phera;
+} 
+Pos_phera;
+
 
 inline std::ostream &operator << (std::ostream &os, gridNode_t &g)
 {
@@ -70,7 +77,7 @@ enum
 };
 
 
-_Float64 score(_Float64 coverage, int repeated_count);
+_Float64 score(_Float64 coverage, int accessable_tiles);
 
 /**
  * Find the distance from poi to the closest point in goals

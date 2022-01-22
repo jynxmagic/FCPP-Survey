@@ -32,7 +32,7 @@ namespace full_coverage_path_planner
 
         std::list<gridNode_t> possible_movements;
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4;)
         {
             int xt = orig_x;
             int yt = orig_y;
@@ -58,6 +58,8 @@ namespace full_coverage_path_planner
             {
                 possible_movements.push_back({{xt, yt}, 0, 0});
             }
+
+            i++;
         }
 
         return possible_movements;
@@ -65,28 +67,21 @@ namespace full_coverage_path_planner
 
     bool Ant::resolveDeadlock(std::vector<std::vector<bool>> visited, std::list<Point_t> goals, std::vector<std::vector<bool>> const& grid)
     {
-        bool resign = a_star_to_open_space(grid, current_location, 1, visited, goals, current_path);
+        std::list<gridNode_t> pathNodesForAstar = current_path;
 
-        multiple_pass_counter = 0;
-        coverage = 0;
+        bool resign = a_star_to_open_space(grid, current_location, 1, visited, goals, pathNodesForAstar);
+
+
+        if(!resign)
+        {
+            current_path = pathNodesForAstar;
+        }
 
         //update visited grid from a*
         std::list<gridNode_t>::iterator it;
         for (it = current_path.begin(); it != current_path.end(); ++it)
         {
-            if (visited[it->pos.y][it->pos.x] == eNodeVisited)
-            {
-                multiple_pass_counter++;
-            }
-            else
-            {
-                coverage++;
-            }
             visited[it->pos.y][it->pos.x] = eNodeVisited;
-        }
-        if (current_path.size() > 0)
-        {
-            multiple_pass_counter--;  // First point is already counted as visited
         }
 
         return resign;

@@ -11,11 +11,9 @@
 
 #include <full_coverage_path_planner/common.h>
 
-_Float64 score(_Float64 coverage, int repeated_count)
+_Float64 score(_Float64 coverage, int accessable_tiles_count)
 {
-  _Float64 coverage_score = coverage*1000.00;
-  _Float64 repeated_score = (coverage_score-repeated_score*100.0);
-  return coverage_score + repeated_score;
+  return abs(1/accessable_tiles_count - 1/(coverage*100));
 }
 
 int distanceToClosestPoint(Point_t poi, std::list<Point_t> const& goals)
