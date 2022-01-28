@@ -259,13 +259,24 @@ bool SpiralSTC::makePlan(const geometry_msgs::PoseStamped& start, const geometry
 
   parsePointlist2Plan(start, goalPoints, plan);
   // Print some metrics:
-  spiral_cpp_metrics_.accessible_counter = spiral_cpp_metrics_.visited_counter
-                                            - spiral_cpp_metrics_.multiple_pass_counter;
-  spiral_cpp_metrics_.total_area_covered = (4.0 * tool_radius_ * tool_radius_) * spiral_cpp_metrics_.accessible_counter;
+  spiral_cpp_metrics_.multiple_pass_counter = 0;
+  spiral_cpp_metrics_.visited_counter = 0;
+  auto test_grid(grid);
+  for (Point_t nodeOnPath : goalPoints)
+  {
+      spiral_cpp_metrics_.visited_counter++;
+      if(test_grid[nodeOnPath.y][nodeOnPath.x] == eNodeVisited)
+      {
+          spiral_cpp_metrics_.multiple_pass_counter++;
+      }
+      else
+      {
+          test_grid[nodeOnPath.y][nodeOnPath.x] = eNodeVisited;
+
+      }
+  }
   ROS_INFO("Total visited: %d", spiral_cpp_metrics_.visited_counter);
   ROS_INFO("Total re-visited: %d", spiral_cpp_metrics_.multiple_pass_counter);
-  ROS_INFO("Total accessible cells: %d", spiral_cpp_metrics_.accessible_counter);
-  ROS_INFO("Total accessible area: %f", spiral_cpp_metrics_.total_area_covered);
 
   // TODO(CesarLopez): Check if global path should be calculated repetitively or just kept
   // (also controlled by planner_frequency parameter in move_base namespace)

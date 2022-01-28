@@ -25,10 +25,12 @@ namespace full_coverage_path_planner
         return pheromoneGrid;
     }
 
-    std::list<gridNode_t> Ant::getPossibleMovements(std::vector<std::vector<bool>> visited)
+    std::list<gridNode_t> Ant::getPossibleMovements(std::vector<std::vector<bool>> visited, int loc_x, int loc_y)
     {
-        int orig_x = current_location.pos.x;
-        int orig_y = current_location.pos.y;
+        uint dx, dy, dx_prev, nRows = visited.size(), nCols = visited[0].size();
+
+        int orig_x = loc_x;
+        int orig_y = loc_y;
 
         std::list<gridNode_t> possible_movements;
 
@@ -39,24 +41,25 @@ namespace full_coverage_path_planner
 
             if (i == 0)
             {
-                xt += 1;
+                xt = orig_x +1;
             }
             if (i == 1)
             {
-                xt -= 1;
+                xt = orig_x -1;
             }
             if (i == 2)
             {
-                yt += 1;
+                yt = orig_y + 1;
             }
             if (i == 3)
             {
-                yt - 1;
+                yt = orig_y - 1;
             }
 
             if (visited[yt][xt] == eNodeOpen)
             {
-                possible_movements.push_back({{xt, yt}, 0, 0});
+                gridNode_t possible_movement = {{xt, yt}, 0, 0};
+                possible_movements.push_back(possible_movement);
             }
 
             i++;
@@ -83,6 +86,8 @@ namespace full_coverage_path_planner
         {
             visited[it->pos.y][it->pos.x] = eNodeVisited;
         }
+
+        current_location = current_path.back();
 
         return resign;
 
@@ -337,10 +342,11 @@ namespace full_coverage_path_planner
 
     void Ant::scoreNearbyTiles(std::vector<std::vector<bool>> visited, int accessable_tiles_count)
     {
-        std::list<gridNode_t> possible_movements = getPossibleMovements(visited);
 
         int orig_x = current_location.pos.x;
         int orig_y = current_location.pos.y;
+
+        std::list<gridNode_t> possible_movements = getPossibleMovements(visited, orig_x, orig_y);
 
         for (gridNode_t point : possible_movements)
         {
@@ -376,7 +382,7 @@ namespace full_coverage_path_planner
         gridNode_t new_location,
         bool add_to_path)
     {
-        current_location = new_location; //Point_t
+        current_location = new_location; //gridNode_t
         if (add_to_path)
         {
             current_path.push_back(current_location);

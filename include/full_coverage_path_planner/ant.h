@@ -49,7 +49,7 @@ namespace full_coverage_path_planner
              * @brief 
              * 
              */
-            std::list<gridNode_t> getPossibleMovements(std::vector<std::vector<bool>> visited);
+            std::list<gridNode_t> getPossibleMovements(std::vector<std::vector<bool>> visited, int loc_x, int loc_y);
 
             /**
              * @brief 

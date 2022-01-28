@@ -1,4 +1,4 @@
-image: no_obstacles_grid.png
+image: one_obstacle_grid.png
 resolution: 0.1
 origin: [-1, -10, 0.0]
 negate: 0
