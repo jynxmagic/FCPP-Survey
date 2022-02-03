@@ -104,7 +104,9 @@ namespace full_coverage_path_planner
                 auto visited(grid);
                 //make sure ant is in init location
                 ant.move({{init.x, init.y}, 0, 0}, false);
-
+                //first location is visited
+                visited[init.y][init.x] = eNodeVisited;
+                
                 std::list<Point_t> goals = map_2_goals(visited, eNodeOpen);
 
                 while (!goals.empty())
@@ -199,6 +201,11 @@ namespace full_coverage_path_planner
                     ant.visited_counter++;
                     goals = map_2_goals(visited, eNodeOpen);
                 }
+
+                //move ant to it's initial location
+                visited[init.y][init.x] = eNodeOpen;
+                goals.push_back({init.x, init.y});
+                ant.resolveDeadlock(visited, goals, grid);
 
                 //recalculate some metrics
                 ant.multiple_pass_counter = 0;

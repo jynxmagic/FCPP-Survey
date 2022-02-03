@@ -184,6 +184,13 @@ std::list<Point_t> UTurn::moveFull(std::vector<std::vector<bool> > const& grid,
 
     goals = map_2_goals(visited, eNodeOpen);  // Retrieve remaining goalpoints
 
+    //move ant to it's initial location
+    visited[init.y][init.x] = eNodeOpen;
+    goals.push_back({init.x, init.y});
+    a_star_to_open_space(grid, pathNodes.back(), 1, visited, goals, pathNodes);
+    visited[init.y][init.x] = eNodeVisited;
+    
+
     for (it = pathNodes.begin(); it != pathNodes.end(); ++it)
     {
       Point_t newPoint = { it->pos.x, it->pos.y };
