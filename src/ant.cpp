@@ -16,7 +16,7 @@ namespace full_coverage_path_planner
         current_location = start_point;
         personal_pheromone_grid = pheromone_grid;
         personal_score_grid = score_grid;
-        velocity = velocity;
+        ant_velocity = velocity;
     }
 
     std::vector<std::vector<_Float64>> Ant::producePheromones(

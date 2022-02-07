@@ -33,7 +33,7 @@ namespace full_coverage_path_planner
             int visited_counter;
             int multiple_pass_counter;
             int coverage;
-            int velocity;
+            int ant_velocity;
             Direction direction;
             std::list<gridNode_t> current_path;
             gridNode_t current_location;

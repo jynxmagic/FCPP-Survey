@@ -75,17 +75,17 @@ namespace full_coverage_path_planner
 
         Point_t start = {init.x, init.y};
 
-        int velocity = 5;
+        int velocity = 1;
         for (int i = 0; i < 1000; ++i)
         {
             if(i > 200 && i < 400)
-                velocity = 4;
+                velocity = 2;
             else if(i >= 400 && i < 500)
                 velocity = 3;
             else if(i >= 500 && i < 700)
-                velocity = 2;
+                velocity = 4;
             else
-                velocity = 1;
+                velocity = 5; 
             
             std::vector<std::vector<_Float64>> personal_pheromone_grid = og_grid;
             std::vector<std::vector<_Float64>> personal_scored_grid = og_grid;
@@ -213,11 +213,11 @@ namespace full_coverage_path_planner
                     goals = map_2_goals(visited, eNodeOpen);
 
                     //move ant extra according to velocity
-                    int moved = 1;
                     int nx = new_location.pos.x;
                     int ny = new_location.pos.y;
 
-                    while (moved != ant.velocity)
+
+                    for(int moved = 1; moved < ant.ant_velocity; moved++)
                     {
                         if (ant.direction == NORTH)
                         {
@@ -243,7 +243,6 @@ namespace full_coverage_path_planner
                             ant.move(nPos, true);
                             ant.visited_counter++;
                             visited[ny][nx] = eNodeVisited;
-                            moved++;
                         }
                         else
                         {
