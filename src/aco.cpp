@@ -75,11 +75,21 @@ namespace full_coverage_path_planner
 
         Point_t start = {init.x, init.y};
 
+        int velocity = 1;
         for (int i = 0; i < 1000; ++i)
         {
+            if(i > 200 && i < 400)
+                velocity = 2;
+            else if(i >= 400 && i < 500)
+                velocity = 3;
+            else if(i >= 500 && i < 700)
+                velocity = 4;
+            else
+                velocity = 5; 
+            
             std::vector<std::vector<_Float64>> personal_pheromone_grid = og_grid;
             std::vector<std::vector<_Float64>> personal_scored_grid = og_grid;
-            ants.push_back(Ant({start, 0, 0}, personal_pheromone_grid, personal_scored_grid));
+            ants.push_back(Ant({start, 0, 0}, personal_pheromone_grid, personal_scored_grid, velocity));
         }
 
         //we will initialize the optimal ant as the first ant in the list to begin.
@@ -196,10 +206,49 @@ namespace full_coverage_path_planner
                         }
                     }
 
+                    //move ant
                     visited[new_location.pos.y][new_location.pos.x] = eNodeVisited;
                     ant.move(new_location, true);
                     ant.visited_counter++;
                     goals = map_2_goals(visited, eNodeOpen);
+
+                    //move ant extra according to velocity
+                    int nx = new_location.pos.x;
+                    int ny = new_location.pos.y;
+
+
+                    for(int moved = 1; moved < ant.ant_velocity; moved++)
+                    {
+                        if (ant.direction == NORTH)
+                        {
+                            ny++;
+                        }
+                        if (ant.direction == EAST)
+                        {
+                            nx++;
+                        }
+                        if (ant.direction == SOUTH)
+                        {
+                            ny--;
+                        }
+                        if (ant.direction == WEST)
+                        {
+                            nx--;
+                        }
+
+                        gridNode_t nPos = {{nx, ny}, 0, 0};
+
+                        if(visited[ny][nx] == eNodeOpen)
+                        {
+                            ant.move(nPos, true);
+                            ant.visited_counter++;
+                            visited[ny][nx] = eNodeVisited;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
 
                 //move ant to it's initial location

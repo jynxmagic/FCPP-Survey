@@ -11,11 +11,12 @@
 
 namespace full_coverage_path_planner
 {
-    Ant::Ant(gridNode_t start_point, std::vector<std::vector<_Float64>> pheromone_grid, std::vector<std::vector<_Float64>> score_grid)
+    Ant::Ant(gridNode_t start_point, std::vector<std::vector<_Float64>> pheromone_grid, std::vector<std::vector<_Float64>> score_grid, int velocity)
     {
         current_location = start_point;
         personal_pheromone_grid = pheromone_grid;
         personal_score_grid = score_grid;
+        ant_velocity = velocity;
     }
 
     std::vector<std::vector<_Float64>> Ant::producePheromones(
@@ -382,6 +383,30 @@ namespace full_coverage_path_planner
         gridNode_t new_location,
         bool add_to_path)
     {
+        int cx = current_location.pos.x;
+        int cy = current_location.pos.y;
+
+        int nx = new_location.pos.x;
+        int ny = new_location.pos.y;
+
+        if (cx+1 == nx)
+        {
+            direction = EAST;
+        }
+        else if (cx-1 == nx)
+        {
+            direction = WEST;
+        }
+        else if (cy+1 == ny)
+        {
+            direction = NORTH;
+        }
+        else
+        {
+            direction = SOUTH;
+        }
+
+
         current_location = new_location; //gridNode_t
         if (add_to_path)
         {

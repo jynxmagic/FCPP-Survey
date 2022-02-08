@@ -38,6 +38,8 @@ typedef struct
 }
 gridNode_t;
 
+enum Direction {NORTH, EAST, SOUTH, WEST};
+
 typedef struct
 {
   gridNode_t pos;
