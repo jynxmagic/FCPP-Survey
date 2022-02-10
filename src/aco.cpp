@@ -45,6 +45,11 @@ namespace full_coverage_path_planner
         //init optimal score is inf
         _Float64 globalScoreOptimal = INFINITY;
 
+        //ACO PARAMS
+        _Float64 evaporation_rate = 0.3;
+        _Float64 production_rate = 0.6;
+        _Float64 system_constant = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
         //2. initialize pheromone grid
         std::vector<std::vector<_Float64>> og_grid(nRows, std::vector<_Float64>(nCols, 1.0));
 
@@ -66,7 +71,7 @@ namespace full_coverage_path_planner
         }
 
         std::vector<std::vector<_Float64>> global_pheromone_grid = og_grid;
-        std::vector<std::vector<_Float64>> global_score_grid = og_grid;
+        std::vector<std::vector<_Float64>> probability_matrix = og_grid;
 
         ROS_INFO("GRID BUILT");
 
@@ -76,20 +81,22 @@ namespace full_coverage_path_planner
         Point_t start = {init.x, init.y};
 
         int velocity = 1;
-        for (int i = 0; i < 1000; ++i)
+        for (int i = 0; i < 100; ++i)
         {
-            if(i > 200 && i < 400)
+     /*       if(i < 20)
+              velocity = 1;
+           else if(i >= 20 && i < 40)
                 velocity = 2;
-            else if(i >= 400 && i < 500)
+            else if(i >= 40 && i < 50)
                 velocity = 3;
-            else if(i >= 500 && i < 700)
+           else if(i >= 50 && i < 70)
                 velocity = 4;
-            else
-                velocity = 5; 
-            
+           else
+                velocity = 5;
+          */      
             std::vector<std::vector<_Float64>> personal_pheromone_grid = og_grid;
             std::vector<std::vector<_Float64>> personal_scored_grid = og_grid;
-            ants.push_back(Ant({start, 0, 0}, personal_pheromone_grid, personal_scored_grid, velocity));
+            ants.push_back(Ant({start, 0, 0}, personal_pheromone_grid, probability_matrix, velocity));
         }
 
         //we will initialize the optimal ant as the first ant in the list to begin.
@@ -116,7 +123,10 @@ namespace full_coverage_path_planner
                 ant.move({{init.x, init.y}, 0, 0}, false);
                 //first location is visited
                 visited[init.y][init.x] = eNodeVisited;
-                
+
+                //calculate probability matrix for ant
+                ant.calculateProbabilityMatrix(global_pheromone_grid);
+
                 std::list<Point_t> goals = map_2_goals(visited, eNodeOpen);
 
                 while (!goals.empty())
@@ -124,6 +134,7 @@ namespace full_coverage_path_planner
                     int orig_x = ant.current_location.pos.x;
                     int orig_y = ant.current_location.pos.y;
 
+                    ant.ant_velocity = rand() % 8; // random velocity between 1..8
 
                     std::list<gridNode_t> possible_movements = ant.getPossibleMovements(visited, orig_x, orig_y);
                     gridNode_t new_location;
@@ -145,53 +156,18 @@ namespace full_coverage_path_planner
                     else
                     {
                         //ant can make some movements, follow on creating probability distro from pheromones.
-                        _Float64 bestScore = -INFINITY;
-                        gridNode_t bestPoint;
-                        if (antCount != 0)
-                        {
-                            for (gridNode_t point : possible_movements)
-                            {
-                                _Float64 pheramone_at_pos = global_pheromone_grid[point.pos.y][point.pos.x];
-
-                                if (pheramone_at_pos > bestScore)
-                                {
-                                    bestScore = pheramone_at_pos;
-                                    bestPoint = point;
-                                }
-                            }
-                        }
-
+                        //70% of the time, ant follows best path.
                         float will_follow_best_path_rng = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-                        if (bestScore != -INFINITY
-
-                            && will_follow_best_path_rng > 0.3) //70% of the time, ant follows best path.
+                        if (will_follow_best_path_rng > 0.3) 
                         {
+                            gridNode_t bestPoint = ant.getBestMovement(possible_movements, global_pheromone_grid);
                             new_location = bestPoint;
                         }
                         else
                         {
-                            std::list<Pos_phera> pheromonesList;
-                            i = 0; //
-                            _Float64 pheramoneSum = 0;
-                            for (gridNode_t point : possible_movements)
-                            {
-                                _Float64 loc_phera_personal = ant.personal_pheromone_grid[point.pos.y][point.pos.x];
-                                _Float64 loc_pehra_global = global_pheromone_grid[point.pos.y][point.pos.x];
-
-                                _Float64 pheramone = 0;
-                                pheramone = loc_phera_personal / loc_pehra_global;
-                                pheramoneSum += pheramone;
-                                pheromonesList.push_back({point, pheramone});
-                            }
-
-                            std::list<Pos_proba> probabiltyDistro;
-                            for (Pos_phera pp : pheromonesList)
-                            {
-                                _Float64 probability = pp.phera / pheramoneSum; //probability normalization
-                                probabiltyDistro.push_back({pp.pos, probability});
-                            }
-
-
+                            //need proba distrobution
+                            std::list<Pos_proba> probabiltyDistro = ant.generateProbabilityDistro(possible_movements, global_pheromone_grid);
+                            //find next tile from generated probability distro
                             _Float64 probaSum = 0;
                             float proba_rng = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
                             for (Pos_proba pp : probabiltyDistro)
@@ -209,8 +185,11 @@ namespace full_coverage_path_planner
                     //move ant
                     visited[new_location.pos.y][new_location.pos.x] = eNodeVisited;
                     ant.move(new_location, true);
+
+                    //produce pheromones
+                    _Float64 pheromones = ant.producePheromones(evaporation_rate, production_rate, system_constant);
+                    global_pheromone_grid[new_location.pos.y][new_location.pos.x] = evaporation_rate * (pheromones + (system_constant * global_pheromone_grid[new_location.pos.y][new_location.pos.x]));
                     ant.visited_counter++;
-                    goals = map_2_goals(visited, eNodeOpen);
 
                     //move ant extra according to velocity
                     int nx = new_location.pos.x;
@@ -243,12 +222,17 @@ namespace full_coverage_path_planner
                             ant.move(nPos, true);
                             ant.visited_counter++;
                             visited[ny][nx] = eNodeVisited;
+                            _Float64 pheromones = ant.producePheromones(evaporation_rate, production_rate, system_constant);
+                            global_pheromone_grid[new_location.pos.y][new_location.pos.x] = evaporation_rate * (pheromones + (system_constant * global_pheromone_grid[new_location.pos.y][new_location.pos.x]));
                         }
                         else
                         {
                             break;
                         }
                     }
+
+                    //regenerate remaining goalpoints
+                    goals = map_2_goals(visited, eNodeOpen);
                 }
 
                 //move ant to it's initial location
@@ -270,9 +254,6 @@ namespace full_coverage_path_planner
                     else
                     {
                         test_grid[nodeOnPath.pos.y][nodeOnPath.pos.x] = eNodeVisited;
-                        _Float64 ant_personal_pheromone_at_location = 0.3 * ((ant.personal_pheromone_grid[nodeOnPath.pos.y][nodeOnPath.pos.x] * (1 / pathSize)) + (0.3 * 0.3));
-                        ant.personal_pheromone_grid[nodeOnPath.pos.y][nodeOnPath.pos.x] = ant_personal_pheromone_at_location;
-                        global_pheromone_grid[nodeOnPath.pos.y][nodeOnPath.pos.x] = 0.7 * (ant_personal_pheromone_at_location + (0.6 * global_pheromone_grid[nodeOnPath.pos.y][nodeOnPath.pos.x]));
 
                     }
                 }

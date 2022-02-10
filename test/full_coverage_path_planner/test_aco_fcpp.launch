@@ -82,5 +82,5 @@
         args="pub --latch /move_base/goal move_base_msgs/MoveBaseActionGoal --file=$(find full_coverage_path_planner)/test/simple_goal.yaml"/>
 
     <!-- rviz -->
-    <node if="$(eval rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(find full_coverage_path_planner)/test/full_coverage_path_planner/fcpp.rviz" />
+    <node if="$(eval rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(find full_coverage_path_planner)/test/full_coverage_path_planner/rviz_aco.rviz" />
 </launch>
