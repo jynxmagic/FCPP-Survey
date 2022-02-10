@@ -28,7 +28,7 @@ namespace full_coverage_path_planner
         public:
 
             std::vector<std::vector<_Float64>> personal_pheromone_grid;
-            std::vector<std::vector<_Float64>> personal_score_grid;
+            std::vector<std::vector<_Float64>> personal_probability_matrix;
             float current_path_score;
             int visited_counter;
             int multiple_pass_counter;
@@ -46,7 +46,12 @@ namespace full_coverage_path_planner
             /**
              *
              **/
-            std::vector<std::vector<_Float64>> producePheromones(std::vector<std::vector<_Float64>> pheromoneGrid, std::vector<std::vector<_Float64>> costGrid);
+            _Float64 producePheromones(_Float64 evaporation_rate, _Float64 pheromone_rate, _Float64 system_constant);
+            /**
+             * @brief 
+             * 
+             */
+            void calculateProbabilityMatrix(std::vector<std::vector<_Float64>> global_pheromone_grid);
             /**
              * @brief 
              * 
@@ -59,11 +64,6 @@ namespace full_coverage_path_planner
              */
             bool resolveDeadlock(std::vector<std::vector<bool>> visited, std::list<Point_t> goals, std::vector<std::vector<bool>> const& grid);
             /**
-             * @brief 
-             * 
-             */
-            void scoreNearbyTiles(std::vector<std::vector<bool>> visited, int accessable_tiles_count);
-            /**
              * 
              * */
             bool canMove(std::vector<std::vector<bool>> const& grid,
@@ -75,5 +75,17 @@ namespace full_coverage_path_planner
                 gridNode_t new_location,
                 bool add_to_path
             );
+            /**
+             * @brief 
+             * 
+             */
+            gridNode_t getBestMovement(std::list<gridNode_t> possible_movements, std::vector<std::vector<_Float64>> global_pheromone_grid);
+
+
+            /**
+             * @brief 
+             * 
+             */
+            std::list<Pos_proba> generateProbabilityDistro(std::list<gridNode_t> possible_movements, std::vector<std::vector<_Float64>> global_pheromone_grid);
     };
 };

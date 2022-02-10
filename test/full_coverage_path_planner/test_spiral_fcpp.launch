@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <launch>
-    <arg name="map" default="$(find full_coverage_path_planner)/maps/grid.yaml"/>
+    <arg name="map" default="$(find full_coverage_path_planner)/maps/one_obstacle_grid.yaml"/>
     <arg name="coverage_area_offset" default="-2.5 -2.5 0 0 0 0"/>
     <arg name="coverage_area_size_x" default="10"/>
     <arg name="coverage_area_size_y" default="10"/>
