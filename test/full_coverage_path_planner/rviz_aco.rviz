@@ -89,13 +89,24 @@ Visualization Manager:
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
-      Color: 25; 255; 0
+      Color: 0; 0; 255
       Enabled: true
       Head Diameter: 0.05000000074505806
       Head Length: 0.019999999552965164
       Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
+      Line Style:
+        Line Width: 0.1
+        Value: Lines
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 255; 25; 0
+        Head Length: 0.019999999552965164
+        Head Radius: 0.05000000074505806
+        Shaft Length: 0.05000000074505806
+        Shaft Radius: 0.019999999552965164
+        Value: Arrow
       Name: Path
       Offset:
         X: 0
