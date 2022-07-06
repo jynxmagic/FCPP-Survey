@@ -30,7 +30,7 @@
 ```source devel/setup.bash```
 
 ## testing
-```roslaunch full_coverage_path_planner test_full_coverage_path_planner.launch```
+```roslaunch full_coverage_path_planner test_aco_fcpp.launch```
 
 ## results
 Simple Grid (maps/grid.yaml):
