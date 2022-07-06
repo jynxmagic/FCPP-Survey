@@ -7,7 +7,7 @@
 
 ```git clone https://github.com/nobleo/full_coverage_path_planner.git```
 
-```git clone git@github.com:mrath/mobile_robot_simulator.git```
+```git clone https://github.com/mrath/mobile_robot_simulator.git```
 
 ```git clone https://github.com/nobleo/tracking_pid.git```
 
