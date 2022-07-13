@@ -5,7 +5,7 @@
 
 ```cd src```
 
-```git clone https://github.com/nobleo/full_coverage_path_planner.git```
+```git clone https://github.com/jynxmagic/FCPP-Survey.git```
 
 ```git clone https://github.com/mrath/mobile_robot_simulator.git```
 
