@@ -1,9 +1,16 @@
 # Full Coverage Path Planner (FCPP)
 
+## Prerequisites
+
+-ROS Noetic
+(https://wiki.ros.org/noetic)
+
+-Turtlebot 3 (https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/)
+
 ## install
 ```export TURTLEBOT3_MODEL=burger```
 
-```cd src```
+```cd catkin_ws/src```
 
 ```git clone https://github.com/jynxmagic/FCPP-Survey.git```
 
