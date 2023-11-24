@@ -7,7 +7,7 @@
 
 -Turtlebot 3 (https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/)
 
-## install
+## Installation
 ```export TURTLEBOT3_MODEL=burger```
 
 ```cd catkin_ws/src```
